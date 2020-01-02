@@ -1,12 +1,12 @@
 package main
 
 import (
-    "context"
     "fmt"
     "github.com/veandco/go-sdl2/img"
     "github.com/veandco/go-sdl2/sdl"
     "github.com/veandco/go-sdl2/ttf"
     "os"
+    "runtime"
     "time"
 )
 
@@ -40,7 +40,7 @@ func run() error {
         return fmt.Errorf("could not draw title: %v", err)
     }
 
-    time.Sleep(time.Second)
+    time.Sleep(500 * time.Millisecond)
 
     s, err := newScene(r)
     if err != nil {
@@ -48,31 +48,18 @@ func run() error {
     }
     defer s.destroy()
 
-    ctx, cancel := context.WithCancel(context.Background())
-    time.AfterFunc(5 * time.Second, cancel)
+    events := make(chan sdl.Event)
+    errc := s.run(events, r)
 
-    return <-s.run(ctx, r)
+    runtime.LockOSThread()
+    for {
+       select {
+        case events <- sdl.WaitEvent():
+        case err := <-errc:
+            return err
+       }
 
-    /*
-    running := true
-    for running {
-        for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-            switch event.(type) {
-            case *sdl.QuitEvent:
-                println("Quit")
-                running = false
-                break
-            default:
-                err := <-s.run(ctx, r)
-                if err != nil {
-                    return err
-                }
-            }
-        }
     }
-
-    return nil
-    */
 }
 
 func drawBackground(r *sdl.Renderer) error {
