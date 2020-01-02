@@ -49,15 +49,11 @@ func run() error {
     defer s.destroy()
 
     ctx, cancel := context.WithCancel(context.Background())
-    defer cancel()
+    time.AfterFunc(5 * time.Second, cancel)
 
-    select {
-        case err := <-s.run(ctx, r):
-            return err
-        case <-time.After(5 * time.Second):
-            return nil
-    }
+    return <-s.run(ctx, r)
 
+    /*
     running := true
     for running {
         for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
@@ -66,11 +62,17 @@ func run() error {
                 println("Quit")
                 running = false
                 break
+            default:
+                err := <-s.run(ctx, r)
+                if err != nil {
+                    return err
+                }
             }
         }
     }
 
     return nil
+    */
 }
 
 func drawBackground(r *sdl.Renderer) error {
