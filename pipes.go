@@ -29,7 +29,7 @@ func newPipe(r *sdl.Renderer) (*pipe, error) {
         x: 400,
         h: 300,
         w: 50,
-        speed: 1,
+        speed: 2,
         inverted: false,
     }, nil
 }
