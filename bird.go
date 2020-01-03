@@ -9,7 +9,7 @@ import (
 
 const (
     gravity = 0.10
-    jumpSpeed = 6
+    jumpSpeed = 5
 )
 
 
