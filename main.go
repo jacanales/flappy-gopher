@@ -38,7 +38,11 @@ func run() error {
         return fmt.Errorf("could not create window: %v", err)
     }
     sdl.PumpEvents()
-    defer w.Destroy()
+    defer func() {
+        if err := w.Destroy(); err != nil {
+            panic(err)
+        }
+    }()
 
     if err := drawTitle(r, "Flappy Gopher"); err != nil {
         return fmt.Errorf("could not draw title: %v", err)
