@@ -68,7 +68,7 @@ func (ps *pipes) update() {
         p.mu.Lock()
         p.x -= ps.speed
         p.mu.Unlock()
-        if p.x > 0 {
+        if p.x+p.w > 0 {
             rem = append(rem, p)
         }
     }
