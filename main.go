@@ -2,12 +2,16 @@ package main
 
 import (
     "fmt"
-    "github.com/veandco/go-sdl2/img"
     "github.com/veandco/go-sdl2/sdl"
     "github.com/veandco/go-sdl2/ttf"
     "os"
     "runtime"
     "time"
+)
+
+const (
+    width = 800
+    height = 600
 )
 
 func main() {
@@ -28,7 +32,7 @@ func run() error {
     }
     defer ttf.Quit()
 
-    w, r, err := sdl.CreateWindowAndRenderer(800, 600, sdl.WINDOW_SHOWN)
+    w, r, err := sdl.CreateWindowAndRenderer(width, height, sdl.WINDOW_SHOWN)
 
     if err != nil {
         return fmt.Errorf("could not create window: %v", err)
@@ -60,23 +64,6 @@ func run() error {
        }
 
     }
-}
-
-func drawBackground(r *sdl.Renderer) error {
-    r.Clear()
-
-    t, err := img.LoadTexture(r, "res/img/background.png")
-    if err != nil {
-        return fmt.Errorf("could not load background image: %v", err)
-    }
-    defer t.Destroy()
-
-    if err := r.Copy(t, nil, nil); err != nil {
-        return fmt.Errorf("could not copy background", err)
-    }
-
-    r.Present()
-    return nil
 }
 
 func drawTitle(r *sdl.Renderer, text string) error {

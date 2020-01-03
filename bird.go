@@ -8,7 +8,7 @@ import (
 )
 
 const (
-    gravity = 0.15
+    gravity = 0.10
     jumpSpeed = 6
 )
 
@@ -36,7 +36,7 @@ func newBird(r *sdl.Renderer) (*bird, error) {
         textures = append(textures, texture)
     }
 
-    return &bird{textures: textures, x: 10, y: 300, w: 50, h: 43}, nil
+    return &bird{textures: textures, x: 10, y: width/2, w: 50, h: 43}, nil
 }
 
 func (b *bird) update() {
@@ -57,11 +57,16 @@ func (b *bird) paint(r *sdl.Renderer) error {
     b.mu.RLock()
     defer b.mu.RUnlock()
 
-    rect := &sdl.Rect{X: b.x, Y: 600 - b.y - b.h/2, W: b.w, H: b.h}
+    rect := &sdl.Rect{X: b.x, Y: height - b.y - b.h/2, W: b.w, H: b.h}
 
     i := b.time/10 % len(b.textures)
     if err := r.Copy(b.textures[i], nil, rect); err != nil {
         return fmt.Errorf("could not copy bird", err)
+    }
+
+    if b.y > height - b.x * 2 {
+        b.y = height - b.h
+        b.speed = 0
     }
 
     return nil
@@ -71,7 +76,7 @@ func (b *bird) restart() {
     b.mu.Lock()
     defer b.mu.Unlock()
 
-    b.y = 300
+    b.y = width/2
     b.speed = 0
     b.dead = false
 }
@@ -113,9 +118,12 @@ func (b *bird) touch (p * pipe) {
         return
     }
 
-    if p.h < b.y - (b.h/2) { // pipe is too low
+    if !p.inverted && p.h < b.y - (b.h/2) { // pipe is too low
         return
     }
 
+    if p.inverted && height - p.h > b.y+b.h/2 { // pipe is too high
+        return
+    }
     b.dead = true
 }
